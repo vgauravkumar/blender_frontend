@@ -19,6 +19,7 @@ const App = () => {
                     <div className="left">
                         <Panel
                             setFileName={setFileName}
+                            fileName={fileName}
                         />
                     </div>
                     <div className="right">
