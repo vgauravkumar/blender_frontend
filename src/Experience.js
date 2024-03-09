@@ -1,7 +1,7 @@
 import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 
-export default function Experience() {
-    const character = useGLTF("./character.glb");
+export default function Experience({fileName}) {
+    const character = useGLTF(`./${fileName}`); // Can only be glb or gltf file
     // const gift = useGLTF("./gift.gltf");
     return (
         <>
