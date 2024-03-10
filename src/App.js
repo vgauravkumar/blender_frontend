@@ -11,6 +11,8 @@ import "./style.css"
 
 const App = () => {
     const [fileName, setFileName] = useState('box.glb');
+    const [num, setNum] = useState(1);
+    console.log(`this is num ${num}`);
     return (
         <div style={{ background: 'green' }}>
             <div className="app">
@@ -19,6 +21,7 @@ const App = () => {
                     <div className="left">
                         <Panel
                             setFileName={setFileName}
+                            setNum={setNum}
                             fileName={fileName}
                         />
                     </div>
@@ -26,6 +29,7 @@ const App = () => {
                         <Canvas>
                             <Experience
                                 fileName={fileName}
+                                num={num}
                             />
                         </Canvas>
                     </div>
