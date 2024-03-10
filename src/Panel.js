@@ -3,30 +3,39 @@ import axios from 'axios';
 
 function Panel({ setFileName, fileName, setScale, setPosition }) {
   const [fileOptions, setFileOptions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [objectSize, setObjectSize] = useState('');
   const [objectPosition, setObjectPosition] = useState('');
   const [saving, setSaving] = useState(false);
 
+  console.log({ fileName });
+
   useEffect(() => {
-    console.log("panel use effect called!!!");
-    // Fetch model names from API when component mounts
-    axios.get('http://localhost:3001/api/models')
-      .then(response => {
+    const handleEffect = async () => {
+      console.log("panel use effect called!!!");
+      // Fetch model names from API when component mounts
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:3001/api/models');
+        console.log({ response });
         const { arr } = response.data;
         const fileNames = arr.map(item => item.file_name);
+        console.log("fileNames", fileNames);
         setFileOptions(fileNames);
         setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching file names:', error);
+      } catch (err) {
+        console.log("Error while fetching filenames:", err);
         setLoading(false);
-      });
+      }
+    }
+    handleEffect();
   }, [fileName]);
 
   const handleChange = event => {
+    console.log("event:", event.target.value);
     // Update the fileName state with the selected value
     setFileName(event.target.value);
+    console.log("event2:", event.target.value);
   };
 
   const uploadFileToAPI = async (file) => {
@@ -41,17 +50,17 @@ function Panel({ setFileName, fileName, setScale, setPosition }) {
         method: 'POST',
         body: formData, // Set the FormData object as the request body
       });
-    
+
       if (!response.ok) {
         throw new Error('Failed to upload file');
       }
-    
+
       console.log("response", response);
       const data = await response.json(); // Assuming the server responds with JSON
-    
+
       // Handle the response data here
       // console.log('File uploaded successfully:', data);
-    
+
       // Assuming you want to set the uploaded file name after successful upload
       console.log("file.name", file.name);
       setFileName(file.name);
@@ -59,7 +68,7 @@ function Panel({ setFileName, fileName, setScale, setPosition }) {
       // Handle any errors that occurred during the upload process
       console.error('Error uploading file:', error);
     }
-    
+
   };
 
   const handleFileUpload = event => {
@@ -79,87 +88,96 @@ function Panel({ setFileName, fileName, setScale, setPosition }) {
   const handleSaveSize = () => {
     // Make an Axios call to save the object size
     setSaving(true);
-    try{axios
-      .put('http://localhost:3001/api/changeSize', {
-        fileName,
-        size: objectSize
-      })
-      .then(response => {
-        console.log('Size saved successfully:', response.data);
-        setSaving(false);
-        setScale(objectSize);
-      })
-      .catch(error => {
-        console.error('Error saving size:', error);
-        setSaving(false);
-      });} catch(e) {
-        console.log(e);
-      }
+    try {
+      axios
+        .put('http://localhost:3001/api/changeSize', {
+          fileName,
+          size: objectSize
+        })
+        .then(response => {
+          console.log('Size saved successfully:', response.data);
+          setSaving(false);
+          setScale(objectSize);
+        })
+        .catch(error => {
+          console.error('Error saving size:', error);
+          setSaving(false);
+        });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
-  const handleSavePosition = () => {
+  const handleSavePosition = async () => {
     // Make an Axios call to save the object size
     setSaving(true);
-    try{axios
-      .put('http://localhost:3001/api/changePosition', {
-        fileName,
-        position: objectPosition
-      })
-      .then(response => {
-        console.log('Size saved successfully:', response.data);
-        setSaving(false);
-        setPosition(objectPosition);
-      })
-      .catch(error => {
-        console.error('Error saving size:', error);
-        setSaving(false);
-      });} catch(e) {
-        console.log(e);
-      }
+    try {
+      await axios
+        .put('http://localhost:3001/api/changePosition', {
+          fileName,
+          position: objectPosition
+        })
+        .then(response => {
+          console.log('Size saved successfully:', response.data);
+          setSaving(false);
+          setPosition(objectPosition);
+        })
+        .catch(error => {
+          console.error('Error saving size:', error);
+          setSaving(false);
+        });
+    } catch (e) {
+      console.log(e);
+      setSaving(false);
+    }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
-    <div>
-      <label htmlFor="fileSelect">Select a file:</label>
-      <select id="fileSelect" onChange={handleChange} defaultValue={fileName}>
-        {fileOptions.map((option, index) => (
-          <option key={index} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-      <br />
-      <label htmlFor="fileUpload">Upload a file:</label>
-      <input id="fileUpload" type="file" onChange={handleFileUpload} />
-      <br />
+    <>
+      {loading ?
+        <div>Loading...</div>
+        : <div>
+          <label htmlFor="fileSelect">Select a file:</label>
+          <select id="fileSelect" onChange={handleChange} value={fileName}>
+            {fileOptions.map((option, index) => (
+              <option key={index} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+          <br />
+          <label htmlFor="fileUpload">Upload a file:</label>
+          <input id="fileUpload" type="file" onChange={handleFileUpload} />
+          <br />
 
-      <label htmlFor="objectSize">Object scale:</label>
-      <input
-        id="objectSize"
-        type="text"
-        value={objectSize}
-        onChange={handleSizeChange}
-      />
-      <button onClick={handleSaveSize} disabled={saving}>
-        {saving ? 'Saving...' : 'Save Size'}
-      </button>
+          <label htmlFor="objectSize">Object scale:</label>
+          <input
+            id="objectSize"
+            type="text"
+            value={objectSize}
+            onChange={handleSizeChange}
+          />
+          <button onClick={handleSaveSize} disabled={saving}>
+            {saving ? 'Saving...' : 'Save Size'}
+          </button>
 
-      <br />
-      <label htmlFor="objectPosition">Object position:</label>
-      <input
-        id="objectPosition"
-        type="text"
-        value={objectPosition}
-        onChange={handleObjectPosition}
-      />
-      <button onClick={handleSavePosition} disabled={saving}>
-        {saving ? 'Saving...' : 'Save Position'}
-      </button>
-    </div>
+          <br />
+          <label htmlFor="objectPosition">Object position:</label>
+          <input
+            id="objectPosition"
+            type="text"
+            value={objectPosition}
+            onChange={handleObjectPosition}
+          />
+          <button onClick={handleSavePosition} disabled={saving}>
+            {saving ? 'Saving...' : 'Save Position'}
+          </button>
+        </div>}
+    </>
   );
 }
 

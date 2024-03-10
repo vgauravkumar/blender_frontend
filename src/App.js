@@ -15,7 +15,7 @@ const App = () => {
     const [scale, setScale] = useState(null);
     const [position, setPosition] = useState(null);
     const [character, setCharacter] = useState(useGLTF(`http://localhost:3001/api/model/download?fileName=${fileName}`));
-    console.log('scale', scale);
+    console.log('fileName,scale,position,character:', fileName, scale, position, character);
     useEffect(() => {
         const handelEffect = () => {
             console.log("App use effect called!!!");
