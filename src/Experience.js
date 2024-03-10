@@ -1,18 +1,18 @@
 import { Environment, OrbitControls } from "@react-three/drei";
 
-export default function Experience({character}) {
+export default function Experience({ character, scale, postion }) {
     // const character = useGLTF(`./${fileName}`); // Can only be glb or gltf file
     // const gift = useGLTF("./gift.gltf");
     console.log("Inside exp.");
     return (
         <>
-        <OrbitControls/>
+            <OrbitControls />
             <primitive
                 object={character.scene}
-                position-x={0}
-                position-y={0}
-                position-z={0}
-                scale={"1"}
+                position-x={postion}
+                position-y={postion}
+                position-z={postion}
+                scale={scale}
             />
 
             {/* <primitive

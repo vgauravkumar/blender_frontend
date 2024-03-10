@@ -12,8 +12,8 @@ import "./style.css"
 
 const App = () => {
     const [fileName, setFileName] = useState('box.glb');
-    const [scale, setScale] = useState(null);
-    const [position, setPosition] = useState(null);
+    const [scale, setScale] = useState("1");
+    const [position, setPosition] = useState(0);
     const [character, setCharacter] = useState(useGLTF(`http://localhost:3001/api/model/download?fileName=${fileName}`));
     console.log('fileName,scale,position,character:', fileName, scale, position, character);
     useEffect(() => {
@@ -30,7 +30,7 @@ const App = () => {
         } catch (e) {
             console.log(e);
         }
-    }, [fileName, scale, position]);
+    }, [fileName]);
 
 
     return (
@@ -50,6 +50,8 @@ const App = () => {
                         {character ? <Canvas>
                             <Experience
                                 character={character}
+                                scale={scale}
+                                postion={position}
                             />
                         </Canvas> : 'Loading...'}
                     </div>
