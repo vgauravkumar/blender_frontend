@@ -1,6 +1,7 @@
 // Importing libraries here
 import { Canvas } from "@react-three/fiber";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useGLTF } from "@react-three/drei";
 
 // Import Components here
 import Experience from "./Experience";
@@ -11,8 +12,27 @@ import "./style.css"
 
 const App = () => {
     const [fileName, setFileName] = useState('box.glb');
-    const [num, setNum] = useState(1);
-    console.log(`this is num ${num}`);
+    const [scale, setScale] = useState(null);
+    const [position, setPosition] = useState(null);
+    const [character, setCharacter] = useState(useGLTF(`http://localhost:3001/api/model/download?fileName=${fileName}`));
+    console.log('scale', scale);
+    useEffect(() => {
+        const handelEffect = () => {
+            console.log("App use effect called!!!");
+            console.log('App.js file name:', fileName);
+            const tempChar = useGLTF(`http://localhost:3001/api/model/download?fileName=${fileName}`);
+            console.log('tempChar', tempChar);
+            console.log("App use effect called again!!!");
+            setCharacter(tempChar);
+        };
+        try {
+            handelEffect();
+        } catch (e) {
+            console.log(e);
+        }
+    }, [fileName, scale, position]);
+
+
     return (
         <div style={{ background: 'green' }}>
             <div className="app">
@@ -21,17 +41,17 @@ const App = () => {
                     <div className="left">
                         <Panel
                             setFileName={setFileName}
-                            setNum={setNum}
                             fileName={fileName}
+                            setScale={setScale}
+                            setPosition={setPosition}
                         />
                     </div>
                     <div className="right">
-                        <Canvas>
+                        {character ? <Canvas>
                             <Experience
-                                fileName={fileName}
-                                num={num}
+                                character={character}
                             />
-                        </Canvas>
+                        </Canvas> : 'Loading...'}
                     </div>
                 </div>
             </div>
